@@ -19,8 +19,11 @@ def count_agreement(Y, indice, group=0):
     return np.mean(np.array(
         [np.all(Y[i] == Y[indice[i]]) for i in range(Y.size) if Y[i] == group]))
 
-def calculate_agreement_difference(Y, indice):
-    return count_agreement(Y, indice, group=1) - count_agreement(Y, indice, group=0)
+def calculate_agreement_difference(Y, indice, sample_balance_size=10000):
+    # balance the classes
+    mask = np.hstack([np.random.choice(np.where(Y == l)[0], sample_balance_size, replace=False)
+                      for l in np.unique(Y)])
+    return count_agreement(Y[mask], indice, group=1) - count_agreement(Y[mask], indice, group=0)
 
 def monoflip(Y, noise_rate=0.05):
     is_flip = np.random.binomial(1, noise_rate, Y.size)
